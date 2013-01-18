@@ -11,8 +11,8 @@ define('port', type=int, default=8888)
 define("draw", type=int, default=1000)
 
 settings = dict(
-    template_path = os.path.join(ROOT_DIR, 'templates'),
-    static_path = os.path.join(ROOT_DIR, 'static'),
+    template_path=os.path.join(ROOT_DIR, 'templates'),
+    static_path=os.path.join(ROOT_DIR, 'static'),
 )
 
 
@@ -20,13 +20,14 @@ class IndexHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("index.html")
 
+
 class SocketIOConnection(tornadio2.SocketConnection):
     users = set()
     drawDataList = collections.deque(maxlen=options.draw)
 
     def on_open(self, info):
         self.users.add(self)
-        
+
         online_number = len(self.users)
         for user in self.users:
             user.emit("online", online_number)
@@ -57,8 +58,11 @@ class SocketIOConnection(tornadio2.SocketConnection):
         online_number = len(self.users)
         for user in self.users:
             user.emit("online", online_number)
-    
-SocketIORouter = tornadio2.router.TornadioRouter(SocketIOConnection, user_settings={"session_check_interval": 15, "session_expiry": 30})
+
+SocketIORouter = tornadio2.router.TornadioRouter(
+    SocketIOConnection,
+    user_settings={"session_check_interval": 15, "session_expiry": 30}
+)
 
 
 application = tornado.web.Application(SocketIORouter.apply_routes([
